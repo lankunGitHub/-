@@ -6,9 +6,9 @@
 
 set -e
 
-NGINX_CONF="/home/lk/服务器运维作业/task2-cluster/nginx/nginx.conf"
+NGINX_CONF="/home/lk/服务器运维作业/task2-cluster-A/nginx/nginx.conf"
 NGINX_CONTAINER="nginx-lb"
-ALGORITHM_DIR="/home/lk/服务器运维作业/task2-cluster/nginx"
+ALGORITHM_DIR="/home/lk/服务器运维作业/task2-cluster-A/nginx"
 
 # 颜色定义
 RED='\033[0;31m'

@@ -10,7 +10,7 @@ NGINX_URL="http://localhost:80"
 CURL_CMD="curl -s -o /dev/null -w"
 TMP_DIR="/tmp/lb-test-$$"
 TIMESTAMP=$(date +%Y%m%d_%H%M%S)
-RESULT_DIR="/home/lk/服务器运维作业/task2-cluster/stress-test/results"
+RESULT_DIR="/home/lk/服务器运维作业/task2-cluster-A/stress-test/results"
 TEST_COUNT=100  # 每次测试发送的请求数量
 CONCURRENCY=10  # 并发数量（用于 ab）
 
@@ -49,7 +49,7 @@ check_containers() {
 
 # 获取当前负载均衡算法
 get_current_algorithm() {
-    local nginx_conf="/home/lk/服务器运维作业/task2-cluster/nginx/nginx.conf"
+    local nginx_conf="/home/lk/服务器运维作业/task2-cluster-A/nginx/nginx.conf"
     if grep -q "least_conn;" "$nginx_conf" 2>/dev/null; then
         echo "least_conn (最少连接)"
     elif grep -q "ip_hash;" "$nginx_conf" 2>/dev/null; then
@@ -527,7 +527,7 @@ main() {
             echo -e "${YELLOW}注意: 此模式会自动切换 Nginx 负载均衡算法${NC}"
             echo ""
 
-            local switch_script="/home/lk/服务器运维作业/task2-cluster/nginx/switch-algorithm.sh"
+            local switch_script="/home/lk/服务器运维作业/task2-cluster-A/nginx/switch-algorithm.sh"
             local algorithms=("round-robin" "least-conn" "ip-hash")
             local algo_names=("轮询 (Round Robin)" "最少连接 (Least Connections)" "IP 哈希 (IP Hash)")
 
