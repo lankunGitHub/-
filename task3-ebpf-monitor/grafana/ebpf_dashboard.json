@@ -1,0 +1,149 @@
+{
+  "dashboard": {
+    "title": "eBPF Linux Performance Monitor",
+    "uid": "ebpf-monitor",
+    "timezone": "browser",
+    "refresh": "5s",
+    "panels": [
+      {
+        "title": "CPU Utilization",
+        "type": "timeseries",
+        "gridPos": {"x": 0, "y": 0, "w": 12, "h": 8},
+        "targets": [
+          {
+            "expr": "cpu_utilization",
+            "legendFormat": "CPU {{cpu}}",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percent",
+            "min": 0,
+            "max": 100
+          }
+        }
+      },
+      {
+        "title": "Memory Usage",
+        "type": "gauge",
+        "gridPos": {"x": 12, "y": 0, "w": 6, "h": 8},
+        "targets": [
+          {
+            "expr": "mem_usage_percent",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percent",
+            "min": 0,
+            "max": 100,
+            "thresholds": {
+              "steps": [
+                {"value": 0, "color": "green"},
+                {"value": 70, "color": "yellow"},
+                {"value": 90, "color": "red"}
+              ]
+            }
+          }
+        }
+      },
+      {
+        "title": "Disk I/O Throughput",
+        "type": "timeseries",
+        "gridPos": {"x": 0, "y": 8, "w": 12, "h": 8},
+        "targets": [
+          {
+            "expr": "disk_read_bytes",
+            "legendFormat": "Read - {{disk}}",
+            "refId": "A"
+          },
+          {
+            "expr": "disk_write_bytes",
+            "legendFormat": "Write - {{disk}}",
+            "refId": "B"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "bytes",
+            "custom": {"axisPlacement": "auto"}
+          }
+        }
+      },
+      {
+        "title": "Network Traffic",
+        "type": "timeseries",
+        "gridPos": {"x": 12, "y": 8, "w": 6, "h": 8},
+        "targets": [
+          {
+            "expr": "net_bytes_in",
+            "legendFormat": "RX - {{iface}}",
+            "refId": "A"
+          },
+          {
+            "expr": "net_bytes_out",
+            "legendFormat": "TX - {{iface}}",
+            "refId": "B"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "bps"
+          }
+        }
+      },
+      {
+        "title": "TCP Connection States",
+        "type": "stat",
+        "gridPos": {"x": 0, "y": 16, "w": 6, "h": 6},
+        "targets": [
+          {"expr": "tcp_established", "legendFormat": "ESTABLISHED", "refId": "A"},
+          {"expr": "tcp_listen", "legendFormat": "LISTEN", "refId": "B"},
+          {"expr": "tcp_time_wait", "legendFormat": "TIME_WAIT", "refId": "C"}
+        ]
+      },
+      {
+        "title": "OOM Events",
+        "type": "stat",
+        "gridPos": {"x": 6, "y": 16, "w": 6, "h": 6},
+        "targets": [
+          {"expr": "mem_oom_count", "refId": "A"}
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "thresholds": {
+              "steps": [
+                {"value": 0, "color": "green"},
+                {"value": 1, "color": "red"}
+              ]
+            }
+          }
+        }
+      },
+      {
+        "title": "File I/O Operations",
+        "type": "timeseries",
+        "gridPos": {"x": 0, "y": 22, "w": 12, "h": 6},
+        "targets": [
+          {"expr": "file_open_count", "legendFormat": "Open", "refId": "A"},
+          {"expr": "file_read_count", "legendFormat": "Read", "refId": "B"},
+          {"expr": "file_write_count", "legendFormat": "Write", "refId": "C"},
+          {"expr": "file_fsync_count", "legendFormat": "Fsync", "refId": "D"}
+        ]
+      },
+      {
+        "title": "Context Switches",
+        "type": "timeseries",
+        "gridPos": {"x": 12, "y": 22, "w": 6, "h": 6},
+        "targets": [
+          {"expr": "rate(cpu_ctx_switches[1m])", "legendFormat": "ctx_switches/sec", "refId": "A"}
+        ]
+      }
+    ],
+    "schemaVersion": 38,
+    "version": 1
+  },
+  "overwrite": true
+}

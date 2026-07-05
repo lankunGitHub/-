@@ -1,0 +1,27 @@
+# Compiled binaries
+cpu_monitor/cpu_monitor
+cpu_monitor/cpu.bpf.o
+cpu_monitor/cpu.skel.h
+mem_monitor/mem_monitor
+mem_monitor/mem.bpf.o
+mem_monitor/mem.skel.h
+disk_monitor/disk_monitor
+disk_monitor/disk.bpf.o
+disk_monitor/disk.skel.h
+file_monitor/file_monitor
+file_monitor/file.bpf.o
+file_monitor/file.skel.h
+net_monitor/net_monitor
+net_monitor/net.bpf.o
+net_monitor/net.skel.h
+
+# Local LLVM toolchain (very large)
+local_llvm/
+
+# Runtime data
+log/
+storage/
+
+# Python cache
+__pycache__/
+*.pyc

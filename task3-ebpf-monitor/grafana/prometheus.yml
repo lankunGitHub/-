@@ -1,0 +1,43 @@
+# Prometheus Configuration for eBPF Performance Monitor
+# ====================================================
+# Scrapes metrics from the eBPF monitor's Prometheus endpoint.
+#
+# Usage:
+#   1. Start the eBPF monitor's Prometheus endpoint:
+#      python3 ui/monitor_ui.py  →  Select 'P' in menu
+#
+#   2. Start Prometheus with this config:
+#      prometheus --config.file=grafana/prometheus.yml
+#
+#   3. Access Prometheus UI at http://localhost:9090
+
+global:
+  scrape_interval: 1s        # Collect metrics every second (real-time)
+  evaluation_interval: 1s
+  scrape_timeout: 500ms
+
+# Alertmanager configuration (optional)
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: []
+
+# Rule files (optional - add alerting rules here)
+rule_files: []
+
+# Scrape configurations
+scrape_configs:
+  # eBPF Performance Monitor metrics endpoint
+  - job_name: 'ebpf_monitor'
+    static_configs:
+      - targets: ['localhost:9091']
+    metric_relabel_configs:
+      # Keep only eBPF-related metrics
+      - source_labels: [__name__]
+        regex: '(cpu_.*|mem_.*|disk_.*|file_.*|net_.*|ebpf_.*)'
+        action: keep
+
+  # Optional: System-level metrics via node_exporter
+  # - job_name: 'node'
+  #   static_configs:
+  #     - targets: ['localhost:9100']
