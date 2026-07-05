@@ -655,7 +655,12 @@ def database_query():
             print("│  No data in database.                                              │")
         else:
             for row in rows:
-                print(f"│  {row[1]:<20s} {row[2]:<12s} {row[3]:<15s} v1={row[6]:<10.1f} v2={row[7]:<10.1f} │")
+                try:
+                    v1 = float(row[6]) if row[6] is not None else 0.0
+                    v2 = float(row[7]) if row[7] is not None else 0.0
+                except (ValueError, TypeError):
+                    v1, v2 = 0.0, 0.0
+                print(f"│  {str(row[1]):<20s} {str(row[2]):<12s} {str(row[3]):<15s} v1={v1:<10.1f} v2={v2:<10.1f} │")
     except Exception as e:
         print(f"│  Query error: {e}")
     print("└─────────────────────────────────────────────────────────────────────┘")
