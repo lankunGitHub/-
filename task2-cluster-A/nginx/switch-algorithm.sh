@@ -1,5 +1,6 @@
 #!/bin/bash
-# ============================================================
+export DOCKER_HOST="${DOCKER_HOST:-unix:///var/run/docker.sock}"
+unset DOCKER_HOST
 # Nginx 负载均衡算法切换脚本
 # 用法: ./switch-algorithm.sh [round-robin|least-conn|ip-hash|status]
 # ============================================================

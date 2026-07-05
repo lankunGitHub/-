@@ -1,5 +1,6 @@
 #!/bin/bash
-# ============================================================
+export DOCKER_HOST="${DOCKER_HOST:-unix:///var/run/docker.sock}"
+unset DOCKER_HOST
 # Version B: Nginx 负载均衡算法切换脚本
 # 支持: weighted-rr (加权轮询), least-conn (加权最少连接),
 #       ip-hash-backup (IP哈希+备用服务器)
