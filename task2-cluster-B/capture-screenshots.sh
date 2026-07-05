@@ -6,7 +6,9 @@
 # ============================================================
 set -e
 
-OUT_DIR="$(cd "$(dirname "$0")" && pwd)/screenshots"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+cd "$SCRIPT_DIR"
+OUT_DIR="$SCRIPT_DIR/screenshots"
 mkdir -p "$OUT_DIR"
 TIMESTAMP=$(date +%Y%m%d_%H%M%S)
 

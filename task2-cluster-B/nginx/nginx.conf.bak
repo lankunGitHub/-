@@ -1,0 +1,82 @@
+# ============================================================
+# Version B: Nginx 加权负载均衡配置 (Weighted Round Robin)
+# ============================================================
+# 权重分配: tomcat1=3 tomcat2=2 tomcat3=1
+# 模拟场景: tomcat1(4核8G), tomcat2(2核4G), tomcat3(1核2G)
+# 预期: 每6个请求中 tomcat1应得3个, tomcat2得2个, tomcat3得1个
+
+worker_processes auto;
+error_log /var/log/nginx/error.log warn;
+pid /var/run/nginx.pid;
+
+events {
+    worker_connections 1024;
+    use epoll;
+}
+
+http {
+    include /etc/nginx/mime.types;
+    default_type application/octet-stream;
+
+    log_format lb_format '$time_iso8601 | $remote_addr | $upstream_addr | '
+                         '$upstream_status | $request | $status | '
+                         '$body_bytes_sent | $request_time | '
+                         'weight=$upstream_response_time';
+
+    access_log /var/log/nginx/loadbalance.log lb_format;
+    access_log /var/log/nginx/access.log combined;
+
+    sendfile on;
+    tcp_nopush on;
+    keepalive_timeout 65;
+
+    # Upstream 配置 - 加权轮询 (Weighted Round Robin)
+    upstream tomcat_cluster {
+        # 加权轮询 (默认算法，通过 weight 参数实现)
+        # 不再需要显式指令，Nginx 默认按权重轮询
+
+        server 172.29.0.11:8081 weight=3 max_fails=3 fail_timeout=15s;
+        server 172.29.0.12:8082 weight=2 max_fails=3 fail_timeout=15s;
+        server 172.29.0.13:8083 weight=1 max_fails=3 fail_timeout=15s;
+    }
+
+    server {
+        listen 80;
+        server_name localhost;
+        charset utf-8;
+
+        # 代理设置
+        location / {
+            proxy_pass http://tomcat_cluster;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+
+            # 响应头 - 标识上游服务器
+            add_header X-Upstream-Server $upstream_addr always;
+            add_header X-Upstream-Status $upstream_status always;
+
+            # 超时配置
+            proxy_connect_timeout 5s;
+            proxy_send_timeout 10s;
+            proxy_read_timeout 10s;
+        }
+
+        # 健康检查端点
+        location /health {
+            access_log off;
+            return 200 "OK\n";
+            add_header Content-Type text/plain;
+        }
+
+        # Nginx 状态
+        location /nginx_status {
+            stub_status on;
+            access_log off;
+            allow 127.0.0.1;
+            allow 172.29.0.0/16;
+            deny all;
+        }
+    }
+}
