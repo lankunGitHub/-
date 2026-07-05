@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Tomcat 服务器配置 - 实例 3
+  监听端口: 8083
+  容器名称: tomcat3
+-->
+<Server port="8007" shutdown="SHUTDOWN">
+    <Listener className="org.apache.catalina.startup.VersionLoggerListener" />
+    <Listener className="org.apache.catalina.core.AprLifecycleListener" SSLEngine="on" />
+    <Listener className="org.apache.catalina.core.JreMemoryLeakPreventionListener" />
+    <Listener className="org.apache.catalina.mbeans.GlobalResourcesLifecycleListener" />
+    <Listener className="org.apache.catalina.core.ThreadLocalLeakPreventionListener" />
+
+    <GlobalNamingResources>
+        <Resource name="UserDatabase" auth="Container"
+                  type="org.apache.catalina.UserDatabase"
+                  description="User database that can be updated and saved"
+                  factory="org.apache.catalina.users.MemoryUserDatabaseFactory"
+                  pathname="conf/tomcat-users.xml" />
+    </GlobalNamingResources>
+
+    <!-- HTTP 连接器 - 端口 8083 -->
+    <Service name="Catalina">
+        <Connector port="8083"
+                   protocol="HTTP/1.1"
+                   connectionTimeout="20000"
+                   redirectPort="8443"
+                   maxThreads="200"
+                   minSpareThreads="10"
+                   acceptCount="100"
+                   URIEncoding="UTF-8"
+                   server="Tomcat-3" />
+
+        <!-- AJP 连接器 -->
+        <Connector port="8011"
+                   protocol="AJP/1.3"
+                   redirectPort="8443"
+                   secretRequired="false" />
+
+        <Engine name="Catalina" defaultHost="localhost" jvmRoute="tomcat3">
+            <Realm className="org.apache.catalina.realm.LockOutRealm">
+                <Realm className="org.apache.catalina.realm.UserDatabaseRealm"
+                       resourceName="UserDatabase"/>
+            </Realm>
+
+            <Host name="localhost"
+                  appBase="webapps"
+                  unpackWARs="true"
+                  autoDeploy="true">
+                <Valve className="org.apache.catalina.valves.AccessLogValve"
+                       directory="logs"
+                       prefix="tomcat3_access"
+                       suffix=".log"
+                       pattern="%h %l %u %t &quot;%r&quot; %s %b %S %D"
+                       resolveHosts="false" />
+            </Host>
+        </Engine>
+    </Service>
+</Server>

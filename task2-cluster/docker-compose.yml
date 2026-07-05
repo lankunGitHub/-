@@ -1,0 +1,120 @@
+networks:
+  cluster-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.28.0.0/16
+
+services:
+  # ==================== Tomcat 实例 1 ====================
+  tomcat1:
+    image: tomcat:9-jdk11
+    container_name: tomcat1
+    hostname: tomcat1
+    ports:
+      - "8081:8081"
+    volumes:
+      - ./webapp/index.jsp:/usr/local/tomcat/webapps/ROOT/index.jsp:ro
+      - ./webapp/WEB-INF/web.xml:/usr/local/tomcat/webapps/ROOT/WEB-INF/web.xml:ro
+      - ./tomcat/server1.xml:/usr/local/tomcat/conf/server.xml:ro
+      - tomcat1-logs:/usr/local/tomcat/logs
+    environment:
+      - TZ=Asia/Shanghai
+      - SERVER_NAME=tomcat1
+    networks:
+      cluster-net:
+        ipv4_address: 172.28.0.11
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O- http://localhost:8081/ || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+    restart: unless-stopped
+
+  # ==================== Tomcat 实例 2 ====================
+  tomcat2:
+    image: tomcat:9-jdk11
+    container_name: tomcat2
+    hostname: tomcat2
+    ports:
+      - "8082:8082"
+    volumes:
+      - ./webapp/index.jsp:/usr/local/tomcat/webapps/ROOT/index.jsp:ro
+      - ./webapp/WEB-INF/web.xml:/usr/local/tomcat/webapps/ROOT/WEB-INF/web.xml:ro
+      - ./tomcat/server2.xml:/usr/local/tomcat/conf/server.xml:ro
+      - tomcat2-logs:/usr/local/tomcat/logs
+    environment:
+      - TZ=Asia/Shanghai
+      - SERVER_NAME=tomcat2
+    networks:
+      cluster-net:
+        ipv4_address: 172.28.0.12
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O- http://localhost:8082/ || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+    restart: unless-stopped
+
+  # ==================== Tomcat 实例 3 ====================
+  tomcat3:
+    image: tomcat:9-jdk11
+    container_name: tomcat3
+    hostname: tomcat3
+    ports:
+      - "8083:8083"
+    volumes:
+      - ./webapp/index.jsp:/usr/local/tomcat/webapps/ROOT/index.jsp:ro
+      - ./webapp/WEB-INF/web.xml:/usr/local/tomcat/webapps/ROOT/WEB-INF/web.xml:ro
+      - ./tomcat/server3.xml:/usr/local/tomcat/conf/server.xml:ro
+      - tomcat3-logs:/usr/local/tomcat/logs
+    environment:
+      - TZ=Asia/Shanghai
+      - SERVER_NAME=tomcat3
+    networks:
+      cluster-net:
+        ipv4_address: 172.28.0.13
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O- http://localhost:8083/ || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+    restart: unless-stopped
+
+  # ==================== Nginx 反向代理 ====================
+  nginx:
+    image: nginx:1.25
+    container_name: nginx-lb
+    hostname: nginx-lb
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/logs:/var/log/nginx
+    environment:
+      - TZ=Asia/Shanghai
+    depends_on:
+      tomcat1:
+        condition: service_healthy
+      tomcat2:
+        condition: service_healthy
+      tomcat3:
+        condition: service_healthy
+    networks:
+      cluster-net:
+        ipv4_address: 172.28.0.10
+    healthcheck:
+      test: ["CMD", "nginx", "-t"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+
+volumes:
+  tomcat1-logs:
+  tomcat2-logs:
+  tomcat3-logs:
