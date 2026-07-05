@@ -30,4 +30,8 @@ __pycache__/
 task3-ebpf-monitor/common/vmlinux.h
 
 # Task2 runtime logs
-task2-cluster/nginx/logs/
+task2-cluster-A/nginx/logs/
+task2-cluster-B/nginx/logs/
+
+# Lock files
+*.~lock.*
